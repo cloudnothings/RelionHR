@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getUsers } from "../../../lib/graph";
+import { disableUser, enableUser, getUsers } from "../../../lib/graph";
 import { router, protectedProcedure } from "../trpc";
 
 export const graphRouter = router({
@@ -9,7 +9,38 @@ export const graphRouter = router({
   lockUser: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return;
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: ctx.session.user.id,
+        },
+      });
+      if (!account?.access_token) {
+        return "No Access Token";
+      }
+      try {
+        await disableUser(input.userId, account.access_token);
+        console.log("User Locked");
+      } catch (error) {
+        console.log(error);
+      }
+    }),
+  unlockUser: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const account = await ctx.prisma.account.findFirst({
+        where: {
+          userId: ctx.session.user.id,
+        },
+      });
+      if (!account?.access_token) {
+        return "No Access Token";
+      }
+      try {
+        await enableUser(input.userId, account.access_token);
+        console.log("User Unlocked");
+      } catch (error) {
+        console.log(error);
+      }
     }),
   getUsers: protectedProcedure.query(async ({ ctx }) => {
     const account = await ctx.prisma.account.findFirst({

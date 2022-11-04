@@ -11,6 +11,20 @@ export async function getGraphToken(tenantId: string) {
   }).then((res) => res.data.access_token as string);
 }
 
+export async function enableUser(userId: string, accessToken: string) {
+  return await axios({
+    method: "patch",
+    url: `https://graph.microsoft.com/v1.0/users/${userId}`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      accountEnabled: true,
+    },
+  }).then((res) => res.status);
+}
+
 export async function disableUser(userId: string, accessToken: string) {
   return await axios({
     method: "patch",
