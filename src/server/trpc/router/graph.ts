@@ -20,7 +20,11 @@ export const graphRouter = router({
     if (!account?.access_token) {
       return "No Access Token";
     }
-    console.log(account);
-    return await getUsers(account.access_token);
+    try {
+      return await getUsers(account.access_token);
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
   }),
 });

@@ -22,27 +22,38 @@ export const LockUser = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   return (
-    <div className="flex items-center h-auto">
-      <div className="border-0 border-t pt-2 border-opacity-20 border-t-gray-500 ml-4">
-        <span>Lock User</span>
-        <div className="mt-4 grid grid-cols-12 gap-6 pb-10">
-          <div className="col-span-12 sm:col-span-6">
-            <AutoCompleteM365Users onChange={changeUser} />
+    <div>
+      <div className="flex items-center h-auto">
+        <div className="pt-2 text-white border-opacity-20 ml-4">
+          <span>Lock User</span>
+          <div className="mt-4 grid grid-cols-12 gap-6 pb-10">
+            <div className="col-span-12 sm:col-span-6">
+              <AutoCompleteM365Users onChange={changeUser} />
+            </div>
           </div>
         </div>
+        {showConfirmationModal && (
+          <ConfirmationModal
+            title="Lock User"
+            message={`Are you sure you want to lock ${selectedUser?.displayName}'s account?`}
+            confirmMessage="Lock User"
+            onConfirm={lockUserHandler}
+            onCancel={() => setShowConfirmationModal(false)}
+            open={showConfirmationModal}
+            setOpen={setShowConfirmationModal}
+            onClose={setShowConfirmationModal}
+          />
+        )}
       </div>
-      {showConfirmationModal && (
-        <ConfirmationModal
-          title="Lock User"
-          message={`Are you sure you want to lock ${selectedUser?.displayName}'s account?`}
-          confirmMessage="Lock User"
-          onConfirm={lockUserHandler}
-          onCancel={() => setShowConfirmationModal(false)}
-          open={showConfirmationModal}
-          setOpen={setShowConfirmationModal}
-          onClose={setShowConfirmationModal}
-        />
-      )}
+      <div className="flex justify-end p-4">
+        <button
+          className="transition text-black border font-bold py-2 px-4 rounded bg-white
+              hover:bg-black hover:text-white duration-300"
+          onClick={() => setShowConfirmationModal(true)}
+        >
+          Lock User
+        </button>
+      </div>
     </div>
   )
 }
