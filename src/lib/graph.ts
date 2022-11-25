@@ -10,6 +10,16 @@ export async function getGraphToken(tenantId: string) {
     data: `client_id=${process.env.AZURE_CLIENT_ID}&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&client_secret=${process.env.AZURE_CLIENT_SECRET}&grant_type=client_credentials&tenant=${process.env.AZURE_TENANT_ID}`,
   }).then((res) => res.data.access_token as string);
 }
+export async function getAccessToken(refresh_token: string) {
+  return await axios({
+    method: "post",
+    url: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/oauth2/v2.0/token`,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    data: `client_id=${process.env.AZURE_CLIENT_ID}&scope=https%3A%2F%2Fgraph.microsoft.com%2F.default&client_secret=${process.env.AZURE_CLIENT_SECRET}&grant_type=refresh_token&refresh_token=${refresh_token}`,
+  }).then((res) => res.data.access_token as string);
+}
 
 export async function enableUser(userId: string, accessToken: string) {
   return await axios({
