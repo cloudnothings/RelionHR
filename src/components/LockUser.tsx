@@ -46,7 +46,7 @@ export const LockUser = () => {
         )}
       </div>
       <div className="flex justify-end p-4">
-        <button
+        <button type="button"
           className="transition text-black border font-bold py-2 px-4 rounded bg-white
               hover:bg-black hover:text-white duration-300"
           onClick={() => setShowConfirmationModal(true)}

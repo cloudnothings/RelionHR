@@ -11,7 +11,7 @@ export interface User {
 }
 
 export const UnlockUser = () => {
-  const unlockUserMutator = trpc.graph.lockUser.useMutation()
+  const unlockUserMutator = trpc.graph.unlockUser.useMutation()
   const [selectedUser, setSelectedUser] = useState<User>()
   const changeUser = (user: User) => {
     setSelectedUser(user)
@@ -54,12 +54,12 @@ export const UnlockUser = () => {
 
       </div>
       <div className="flex justify-end p-4">
-        <button
-          className="transition text-black border font-bold py-2 px-4 rounded bg-white
+        <button type="button"
+          className="btn transition text-black border font-bold py-2 px-4 rounded bg-white
                 hover:bg-black hover:text-white duration-300"
           onClick={() => setShowConfirmationModal(true)}
         >
-          Lock User
+          Unlock User
         </button>
       </div>
     </>

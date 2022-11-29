@@ -10,8 +10,8 @@ export interface Command {
   name: string,
 }
 const cmdList = [
-  { id: 1, name: 'lock-user' },
-  { id: 2, name: 'unlock-user' },
+  { id: 1, name: 'lock user' },
+  { id: 2, name: 'unlock user' },
 ]
 function classNames(...classes: any[]) {
   return classes.filter(Boolean).join(' ')
@@ -28,11 +28,11 @@ export default function CommandPalette() {
       })
   const cmdJSX = () => {
     switch (cmd) {
-      case 'lock-user':
+      case 'lock user':
         return (
           <LockUser />
         )
-      case 'unlock-user':
+      case 'unlock user':
         return (
           <UnlockUser />
         )
