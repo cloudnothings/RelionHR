@@ -1,14 +1,8 @@
+import type { User } from "@microsoft/microsoft-graph-types";
 import { useState } from 'react'
 import { trpc } from '../utils/trpc'
 import AutoCompleteM365Users from './AutocompleteM365Users'
 import ConfirmationModal from './ConfirmationModal'
-
-export interface User {
-  id: string
-  displayName: string
-  accountEnabled: boolean
-  userPrincipalName: string
-}
 
 export const UnlockUser = () => {
   const unlockUserMutator = trpc.graph.unlockUser.useMutation()
@@ -16,18 +10,15 @@ export const UnlockUser = () => {
   const changeUser = (user: User) => {
     setSelectedUser(user)
   }
-
   const unlockUserHandler = () => {
-    if (selectedUser) {
+    if (selectedUser?.id) {
       unlockUserMutator.mutateAsync({
         userId: selectedUser.id,
       })
       setShowConfirmationModal(false)
     }
   }
-
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-
   return (
     <>
       <div className="flex items-center h-auto">
@@ -45,13 +36,10 @@ export const UnlockUser = () => {
             message={`Are you sure you want to unlock ${selectedUser?.displayName}'s account?`}
             confirmMessage="Unlock User"
             onConfirm={unlockUserHandler}
-            onCancel={() => setShowConfirmationModal(false)}
             open={showConfirmationModal}
             setOpen={setShowConfirmationModal}
-            onClose={setShowConfirmationModal}
           />
         )}
-
       </div>
       <div className="flex justify-end p-4">
         <button type="button"

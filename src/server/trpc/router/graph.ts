@@ -1,5 +1,12 @@
+import type { User } from "@microsoft/microsoft-graph-types";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { disableUser, enableUser, getUsers } from "../../common/graph";
+import {
+  disableUser,
+  enableUser,
+  getUsers,
+  resetUserPassword,
+} from "../../common/graph";
 
 import { router, protectedProcedure } from "../trpc";
 
@@ -14,7 +21,11 @@ export const graphRouter = router({
         await disableUser(input.userId, ctx.session.accessToken);
         console.log("User Locked");
       } catch (error) {
-        console.warn(error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: error,
+        });
       }
     }),
   unlockUser: protectedProcedure
@@ -26,8 +37,13 @@ export const graphRouter = router({
         }
         await enableUser(input.userId, ctx.session.accessToken);
         console.log("User Unlocked");
+        return true;
       } catch (error) {
-        console.warn(error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: error,
+        });
       }
     }),
   getUsers: protectedProcedure.query(async ({ ctx }) => {
@@ -35,10 +51,35 @@ export const graphRouter = router({
       if (!ctx.session?.accessToken) {
         throw new Error("No access token");
       }
-      return await getUsers(ctx.session.accessToken);
+      return (await getUsers(ctx.session.accessToken)) as User[];
     } catch (error) {
-      console.warn(error);
-      return [];
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "An unexpected error occurred, please try again later.",
+        cause: error,
+      });
     }
   }),
+  resetUserPassword: protectedProcedure
+    .input(z.object({ userId: z.string(), password: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (!ctx.session?.accessToken) {
+          throw new Error("No access token");
+        }
+        await resetUserPassword({
+          userId: input.userId,
+          password: input.password,
+          accessToken: ctx.session.accessToken,
+        });
+        console.log("Password Reset");
+        return true;
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: error,
+        });
+      }
+    }),
 });

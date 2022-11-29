@@ -30,16 +30,16 @@ async function refreshAccessToken(token: any) {
   }
 }
 export const authOptions: NextAuthOptions = {
-  secret: env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   // Include user.id on session
   callbacks: {
     async jwt({ token, user, account }) {
       // Initial sign in
       if (account && user) {
+        console.log("Initial sign in");
         return {
           accessToken: account.access_token,
-          accessTokenExpires:
-            Date.now() + (account.expires_at as number) * 1000,
+          accessTokenExpires: account.expires_at as number,
           refreshToken: account.refresh_token,
           user,
         };
@@ -49,6 +49,7 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
       // Access token has expired, try to update it
+      console.log("Access token has expired, trying to update it");
       return refreshAccessToken(token);
     },
     async session({ session, token }) {

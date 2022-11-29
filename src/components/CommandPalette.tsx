@@ -4,6 +4,7 @@ import LockUser from './LockUser'
 import UnlockUser from './UnlockUser'
 import { FaceFrownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { signOut } from 'next-auth/react'
+import ResetUserPassword from './ResetUserPassword'
 
 export interface Command {
   id: number,
@@ -12,8 +13,9 @@ export interface Command {
 const cmdList = [
   { id: 1, name: 'lock user' },
   { id: 2, name: 'unlock user' },
+  { id: 3, name: 'reset user password' },
 ]
-function classNames(...classes: any[]) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 export default function CommandPalette() {
@@ -36,6 +38,11 @@ export default function CommandPalette() {
         return (
           <UnlockUser />
         )
+      case 'reset user password':
+        return (
+          <ResetUserPassword />
+        )
+
       default:
         return <></>
     }
@@ -55,7 +62,7 @@ export default function CommandPalette() {
               onChange={(event) => setQuery(event.target.value)}
             />
           </div>
-          {filteredCmd.length > 0 && (
+          {filteredCmd.length > 0 ? (
             <Combobox.Options
               static
               className="max-h-80 scroll-py-2 divide-y divide-gray-500 divide-opacity-20 overflow-y-auto">
@@ -68,16 +75,16 @@ export default function CommandPalette() {
                       className={({ active }) =>
                         classNames(
                           'flex cursor-default select-none items-center rounded-md px-3 py-2',
-                          active && 'bg-gray-800 text-white',
+                          active ? 'bg-gray-800 text-white' : '',
                         )
                       }
                     >
                       {({ active }) => (
                         <>
                           <span className="ml-3 flex-auto truncate">{cmd.name}</span>
-                          {active && (
-                            <span className="ml-3 flex-none text-gray-400">Jump to...</span>
-                          )}
+                          {active ? (
+                            <span className="ml-3 flex-none text-gray-400">Select</span>
+                          ) : null}
                         </>
                       )}
                     </Combobox.Option>
@@ -85,8 +92,8 @@ export default function CommandPalette() {
                 </ul>
               </li>
             </Combobox.Options>
-          )}
-          {query === '' && (
+          ) : null}
+          {query === '' ? (
             <Combobox.Options
               static
               className="max-h-80 scroll-py-2 divide-y divide-gray-500 divide-opacity-20 overflow-y-auto">
@@ -99,16 +106,16 @@ export default function CommandPalette() {
                       className={({ active }) =>
                         classNames(
                           'flex cursor-default select-none items-center rounded-md px-3 py-2',
-                          active && 'bg-[#333] text-white',
+                          active ? 'bg-[#333] text-white' : '',
                         )
                       }
                     >
                       {({ active }) => (
                         <>
                           <span className="ml-3 flex-auto truncate">{cmd.name}</span>
-                          {active && (
-                            <span className="ml-3 flex-none text-[#888]">Jump to...</span>
-                          )}
+                          {active ? (
+                            <span className="ml-3 flex-none text-[#888]">Select</span>
+                          ) : null}
                         </>
                       )}
                     </Combobox.Option>
@@ -116,13 +123,13 @@ export default function CommandPalette() {
                 </ul>
               </li>
             </Combobox.Options>
-          )}
-          {query !== '' && filteredCmd.length === 0 && (
+          ) : null}
+          {query !== '' && filteredCmd.length === 0 ? (
             <div className="py-14 px-6 text-center sm:px-14">
               <FaceFrownIcon className="mx-auto h-6 w-6 text-gray-500" aria-hidden="true" />
               <p className="mt-4 text-sm text-gray-200">No matching commands.</p>
             </div>
-          )}
+          ) : null}
         </Combobox>
         <div className=''>
           {cmdJSX()}

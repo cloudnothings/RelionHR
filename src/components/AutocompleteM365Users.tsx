@@ -1,24 +1,29 @@
+import type { User } from "@microsoft/microsoft-graph-types";
 import { useState } from 'react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 import { trpc } from '../utils/trpc'
 
-function classNames(...classes: any) {
+function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
 }
 export default function AutoCompleteM365Users({
   onChange,
 }: {
-  onChange: (user: any) => void
+  onChange: (user: User) => void
 }) {
   const [query, setQuery] = useState('')
-  const [user, setSelectedUser] = useState()
-  const [users, setUsers] = useState<any[]>([])
+  const [user, setSelectedUser] = useState<User>()
+  const [users, setUsers] = useState<User[]>([])
   trpc.graph.getUsers.useQuery(undefined, {
-    onSuccess: setUsers,
+    onSuccess: (users) => {
+      if (users.length > 0) {
+        setUsers(users)
+      }
+    },
     refetchOnWindowFocus: false,
   })
-  const changeUserHandler = (user: any) => {
+  const changeUserHandler = (user: User) => {
     setSelectedUser(user)
     onChange(user)
   }
@@ -33,9 +38,9 @@ export default function AutoCompleteM365Users({
       <Combobox.Label className="block text-sm font-medium text-white">User</Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
-          className="w-full text-white rounded-md border border-white bg-transparent py-2 pl-3 pr-14 focus:border-white focus:outline-none focus:ring-0  sm:text-sm"
+          className="w-full text-white rounded-md border border-white bg-transparent py-2 pl-3 pr-14 focus:border-white focus:outline-none focus:ring-0 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(user: any) => (user?.displayName ? user.displayName : '')}
+          displayValue={(user: User) => (user?.displayName ? user.displayName : '')}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronUpDownIcon className="h-5 w-5 text-[#888]" aria-hidden="true" />
@@ -56,7 +61,7 @@ export default function AutoCompleteM365Users({
               >
                 {({ active, selected }) => (
                   <>
-                    <span className={classNames('block truncate', selected && 'font-semibold')}>
+                    <span className={classNames('block truncate', selected ? 'font-semibold' : '')}>
                       {u.displayName}
                     </span>
                     <span
@@ -65,7 +70,7 @@ export default function AutoCompleteM365Users({
                         active ? 'text-white' : 'text-[#888]',
                       )}
                     >
-                      {u.userPrincipalName}
+                      {u.mail}
                     </span>
 
                     {selected && (

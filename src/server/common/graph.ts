@@ -1,3 +1,5 @@
+import { Client } from "@microsoft/microsoft-graph-client";
+import type { User } from "@microsoft/microsoft-graph-types";
 import axios from "axios";
 import { env } from "../../env/server.mjs";
 
@@ -156,50 +158,19 @@ export async function resetUserPassword({
         forceChangePasswordNextSignIn: false,
       },
     },
-  }).catch((error) => {
-    console.log(error);
-    return "Error while resetting password";
   });
   return "Password reset";
 }
-async function getNextLink(url: string, accessToken: string) {
-  return await axios({
-    method: "GET",
-    url: url,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  }).then((res) => res);
-}
-
 export async function getUsers(accessToken: string) {
-  return fetch(
-    "https://graph.microsoft.com/v1.0/users?$select=id,assignedLicenses,userPrincipalName,displayName,accountEnabled,onPremisesSyncEnabled,&$top=999",
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  )
-    .then(async (res) => res.json())
-    .then(async (res) => {
-      // parse the data
-      if (res["@odata.nextLink"]) {
-        let users = res.value;
-        let nextLink = res["@odata.nextLink"];
-        while (nextLink) {
-          await getNextLink(nextLink, accessToken)
-            .then((r) => {
-              users = users.concat(r.data.value);
-              nextLink = r.data["@odata.nextLink"];
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-        return users;
-      } else {
-        return res.value;
-      }
-    });
+  // new graph client
+  const client = Client.init({
+    authProvider: (done) => {
+      done(null, accessToken);
+    },
+  });
+  // get all users
+  return (await client
+    .api("/users")
+    .get()
+    .then((res) => res.value)) as User[];
 }

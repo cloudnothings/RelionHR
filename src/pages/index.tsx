@@ -2,9 +2,15 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, useSession } from "next-auth/react";
 import CommandPalette from "../components/CommandPalette";
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
   const { data: session, status } = useSession();
+  useEffect(() => {
+    if (session?.error === "RefreshAccessTokenError") {
+      signIn(); // Force sign in to hopefully resolve error
+    }
+  }, [session]);
   if (status === "loading") return <div className="bg-black"></div>;
   return (
     <>
