@@ -26,10 +26,6 @@ const UserTools = () => {
       }
     }
   }, [items, selectedItem])
-
-  const unlockMFAHandler = () => {
-    console.log('unlockMFAHandler')
-  }
   return (
     // @ts-expect-error - This is a bug in the auto-animate library
     <div className='flex flex-row bg-[#222] items-center justify-center rounded-lg p-4 gap-4' ref={animationParent}>
@@ -46,13 +42,12 @@ const UserTools = () => {
             </option>
           ))}
         </select>
-        <div className='grid grid-cols-3 gap-4 px-2'>
+        <div className='grid grid-cols-2 gap-4 '>
           <LockAccountButton user={user} />
           <UnlockAccountButton user={user} />
-          <StyledButton message={'Unlock MFA'} onClick={unlockMFAHandler} />
         </div>
         {user ? (
-          <div className='px-2'>
+          <div className=''>
             <div className='text-white text-2xl self-start'>
               User Details
             </div>
