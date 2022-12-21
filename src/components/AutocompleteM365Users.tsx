@@ -1,6 +1,6 @@
 import type { User } from "@microsoft/microsoft-graph-types";
 import { useState } from 'react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import { CheckIcon, ChevronUpDownIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import { Combobox } from '@headlessui/react'
 import { trpc } from '../utils/trpc'
 
@@ -10,10 +10,10 @@ function classNames(...classes: string[]) {
 export default function AutoCompleteM365Users({
   onChange,
 }: {
-  onChange: (user: User) => void
+  onChange: (user: User | null) => void
 }) {
   const [query, setQuery] = useState('')
-  const [user, setSelectedUser] = useState<User>()
+  const [user, setSelectedUser] = useState<User | null>(null)
   const [users, setUsers] = useState<User[]>([])
   trpc.graph.getUsers.useQuery(undefined, {
     onSuccess: (users) => {
@@ -21,8 +21,12 @@ export default function AutoCompleteM365Users({
         setUsers(users)
       }
     },
-    refetchOnWindowFocus: false,
   })
+  const clearSelectionHandler = () => {
+    setSelectedUser(null)
+    onChange(null)
+    setQuery('')
+  }
   const changeUserHandler = (user: User) => {
     setSelectedUser(user)
     onChange(user)
@@ -35,16 +39,18 @@ export default function AutoCompleteM365Users({
       })
   return (
     <Combobox as="div" value={user} onChange={changeUserHandler} >
-      <Combobox.Label className="block text-sm font-medium text-white">User</Combobox.Label>
-      <div className="relative mt-1">
+      <div className="relative">
         <Combobox.Input
-          className="w-full text-white rounded-md border border-white bg-transparent py-2 pl-3 pr-14 focus:border-white focus:outline-none focus:ring-0 sm:text-sm"
+          className="w-full text-white rounded-md border border-white bg-transparent py-2 pl-3 pr-72 focus:border-white focus:outline-none focus:ring-0 sm:text-sm"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(user: User) => (user?.displayName ? user.displayName : '')}
         />
-        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-          <ChevronUpDownIcon className="h-5 w-5 text-[#888]" aria-hidden="true" />
+        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md pr-10 focus:outline-none">
+          <ChevronUpDownIcon className="h-6 w-6 text-[#888]" aria-hidden="true" />
         </Combobox.Button>
+        <button className="absolute inset-y-0 right-0 flex items-center rounded-r-md p-2 focus:outline-none" onClick={clearSelectionHandler}>
+          <XMarkIcon className="h-6 w-6 text-[#888] hover:bg-[#555] rounded-lg" aria-hidden="true" />
+        </button>
 
         {filteredUsers.length > 0 && (
           <Combobox.Options className="absolute text-white z-10 mt-1 max h-80 w-full overflow-auto rounded-md bg-[#111] py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">

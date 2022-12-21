@@ -171,6 +171,24 @@ export async function getUsers(accessToken: string) {
   // get all users
   return (await client
     .api("/users")
+    .select("id,displayName,mail,accountEnabled")
     .get()
-    .then((res) => res.value)) as User[];
+    .then((res) => {
+      return res.value;
+    })) as User[];
+}
+export async function getUser(accessToken: string, userId: string) {
+  // new graph client
+  const client = Client.init({
+    authProvider: (done) => {
+      done(null, accessToken);
+    },
+  });
+  // get all users
+  return (await client
+    .api("/users/" + userId)
+    .get()
+    .then((res) => {
+      return res.value;
+    })) as User;
 }

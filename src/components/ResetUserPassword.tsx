@@ -6,8 +6,8 @@ import ConfirmationModal from './ConfirmationModal'
 
 export const ResetUserPassword = () => {
   const ResetPasswordMutator = trpc.graph.resetUserPassword.useMutation()
-  const [selectedUser, setSelectedUser] = useState<User>()
-  const changeUser = (user: User) => {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const changeUser = (user: User | null) => {
     setSelectedUser(user)
   }
   const [password, setPassword] = useState<string>('')

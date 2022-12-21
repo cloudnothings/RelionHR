@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^1.0.0-beta.5",
     "@headlessui/react": "^1.7.4",
     "@heroicons/react": "^2.0.13",
     "@microsoft/microsoft-graph-client": "^3.0.4",

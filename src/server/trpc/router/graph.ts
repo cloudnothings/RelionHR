@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   disableUser,
   enableUser,
+  getUser,
   getUsers,
   resetUserPassword,
 } from "../../common/graph";
@@ -60,6 +61,30 @@ export const graphRouter = router({
       });
     }
   }),
+  getUser: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      try {
+        if (!ctx.session?.accessToken) {
+          throw new Error("No access token");
+        }
+        if (!input.userId) {
+          throw new Error("No user id");
+        }
+        return (await getUser(ctx.session.accessToken, input.userId)) as User;
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: error,
+        });
+      }
+    }),
+
   resetUserPassword: protectedProcedure
     .input(z.object({ userId: z.string(), password: z.string() }))
     .mutation(async ({ ctx, input }) => {

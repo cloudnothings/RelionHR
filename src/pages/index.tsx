@@ -1,16 +1,19 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import { signIn, useSession } from "next-auth/react";
-import CommandPalette from "../components/CommandPalette";
 import { useEffect } from "react";
+import Tools from "../components/Tools";
+import HomeSignIn from "../components/HomeSignIn";
 
 const Home: NextPage = () => {
+  // If the user's access token has expired, force them to sign in again
   const { data: session, status } = useSession();
   useEffect(() => {
     if (session?.error === "RefreshAccessTokenError") {
       signIn(); // Force sign in to hopefully resolve error
     }
   }, [session]);
+
   if (status === "loading") return <div className="bg-black"></div>;
   return (
     <>
@@ -20,25 +23,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/logo-only.svg" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-black">
-        {session ? (<CommandPalette />
-        ) : (<><div className="container flex flex-col items-center justify-center gap-8 px-4 py-16 ">
-          <h1 className="text-5xl font-extrabold tracking-tight text-[#13b6f6] sm:text-[5rem]">
-            Relion <span className="text-[hsl(0,0%,100%)]">HR</span>
-          </h1>
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-
-              </p>
-              <button type="button"
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
-                onClick={() => signIn('azure-ad')}
-              >
-                {"Sign in with your Microsoft Account"}
-              </button>
-            </div>
-          </div>
-        </div ></>)}
+        {session ? (
+          <Tools />
+        ) : (
+          <HomeSignIn />
+        )}
       </main >
     </>
   );
